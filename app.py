@@ -1,11 +1,9 @@
 from flask import Flask, render_template
-
 import requests
 import os
 import sys
 
 from pathlib import Path
-
 from ultralytics import YOLO
 
 
@@ -21,11 +19,7 @@ AI_DIR = Path(__file__).resolve().parent
 # ============================================================
 
 if str(AI_DIR) not in sys.path:
-
-    sys.path.insert(
-        0,
-        str(AI_DIR)
-    )
+    sys.path.insert(0, str(AI_DIR))
 
 
 # ============================================================
@@ -39,18 +33,12 @@ try:
         predict_fire_status
     )
 
-    print(
-        "\nSuccessfully imported predict.py"
-    )
+    print("\nSuccessfully imported predict.py")
 
 except Exception as e:
 
-    print(
-        "\nERROR importing predict.py:"
-    )
-
+    print("\nERROR importing predict.py:")
     print(e)
-
     raise
 
 
@@ -66,30 +54,19 @@ app = Flask(__name__)
 # ============================================================
 
 YOLO_MODEL_PATH = (
-
     AI_DIR
-
     / "yolo"
-
     / "runs"
-
     / "fire_smoke"
-
     / "weights"
-
     / "best.pt"
-
 )
 
 
 YOLO_IMAGE_PATH = (
-
     AI_DIR
-
     / "yolo"
-
     / "test_image.jpg"
-
 )
 
 
@@ -99,20 +76,6 @@ YOLO_IMAGE_PATH = (
 
 CHANNEL_ID = "3519763"
 
-
-# ------------------------------------------------------------
-# IMPORTANT:
-#
-# os.getenv() takes the ENVIRONMENT VARIABLE NAME.
-#
-# Correct:
-#
-# os.getenv("THINGSPEAK_READ_API_KEY", "")
-#
-# NOT:
-#
-# os.getenv("J0MROKKVC9ZJUOOT")
-# ------------------------------------------------------------
 
 THINGSPEAK_READ_API_KEY = os.getenv(
     "THINGSPEAK_READ_API_KEY",
@@ -127,11 +90,8 @@ THINGSPEAK_WRITE_API_KEY = os.getenv(
 
 
 THINGSPEAK_READ_URL = (
-
     f"https://api.thingspeak.com/channels/"
-
     f"{CHANNEL_ID}/feeds/last.json"
-
 )
 
 
@@ -149,7 +109,6 @@ print("=" * 65)
 print("LOADING RANDOM FOREST MODEL")
 print("=" * 65)
 
-
 try:
 
     RF_MODEL = load_model()
@@ -157,7 +116,6 @@ try:
     print(
         "Random Forest model loaded successfully."
     )
-
 
 except Exception as e:
 
@@ -179,30 +137,16 @@ print("=" * 65)
 print("LOADING YOLO MODEL")
 print("=" * 65)
 
-
-print(
-    "YOLO Model Path:"
-)
-
-print(
-    YOLO_MODEL_PATH
-)
-
+print("YOLO Model Path:")
+print(YOLO_MODEL_PATH)
 
 print(
     "Model exists:",
     YOLO_MODEL_PATH.exists()
 )
 
-
-print(
-    "\nYOLO Image Path:"
-)
-
-print(
-    YOLO_IMAGE_PATH
-)
-
+print("\nYOLO Image Path:")
+print(YOLO_IMAGE_PATH)
 
 print(
     "Image exists:",
@@ -218,10 +162,8 @@ try:
     if not YOLO_MODEL_PATH.exists():
 
         raise FileNotFoundError(
-
             f"\nYOLO model not found:\n"
             f"{YOLO_MODEL_PATH}"
-
         )
 
 
@@ -260,14 +202,16 @@ def get_sensor_data():
 
             print("\n")
             print("=" * 65)
+
             print(
                 "ERROR: THINGSPEAK_READ_API_KEY "
                 "is not configured."
             )
+
             print("=" * 65)
 
             print(
-                "\nSet it in PowerShell using:"
+                '\nSet it in PowerShell using:'
             )
 
             print(
@@ -291,13 +235,8 @@ def get_sensor_data():
             },
 
             timeout=10
-
         )
 
-
-        # ----------------------------------------------------
-        # DISPLAY RESPONSE
-        # ----------------------------------------------------
 
         print("\n")
         print("-" * 65)
@@ -318,10 +257,6 @@ def get_sensor_data():
         response.raise_for_status()
 
 
-        # ----------------------------------------------------
-        # JSON
-        # ----------------------------------------------------
-
         data = response.json()
 
 
@@ -329,21 +264,10 @@ def get_sensor_data():
         # SENSOR FIELDS
         # ----------------------------------------------------
 
-        temperature = data.get(
-            "field1"
-        )
-
-        humidity = data.get(
-            "field2"
-        )
-
-        gas = data.get(
-            "field3"
-        )
-
-        flame = data.get(
-            "field4"
-        )
+        temperature = data.get("field1")
+        humidity = data.get("field2")
+        gas = data.get("field3")
+        flame = data.get("field4")
 
 
         # ----------------------------------------------------
@@ -351,31 +275,24 @@ def get_sensor_data():
         # ----------------------------------------------------
 
         if temperature is None:
-
             raise ValueError(
                 "ThingSpeak field1 "
                 "(temperature) is empty."
             )
 
-
         if humidity is None:
-
             raise ValueError(
                 "ThingSpeak field2 "
                 "(humidity) is empty."
             )
 
-
         if gas is None:
-
             raise ValueError(
                 "ThingSpeak field3 "
                 "(gas) is empty."
             )
 
-
         if flame is None:
-
             raise ValueError(
                 "ThingSpeak field4 "
                 "(flame) is empty."
@@ -386,21 +303,10 @@ def get_sensor_data():
         # CONVERT
         # ----------------------------------------------------
 
-        temperature = float(
-            temperature
-        )
-
-        humidity = float(
-            humidity
-        )
-
-        gas = float(
-            gas
-        )
-
-        flame = float(
-            flame
-        )
+        temperature = float(temperature)
+        humidity = float(humidity)
+        gas = float(gas)
+        flame = float(flame)
 
 
         # ----------------------------------------------------
@@ -411,38 +317,29 @@ def get_sensor_data():
         print("-" * 65)
 
         print(
-            f"Temperature : "
-            f"{temperature:.2f} °C"
+            f"Temperature : {temperature:.2f} °C"
         )
 
         print(
-            f"Humidity    : "
-            f"{humidity:.2f} %"
+            f"Humidity    : {humidity:.2f} %"
         )
 
         print(
-            f"Gas         : "
-            f"{gas:.2f}"
+            f"Gas         : {gas:.2f}"
         )
 
         print(
-            f"Flame       : "
-            f"{flame}"
+            f"Flame       : {flame}"
         )
 
         print("-" * 65)
 
 
         return (
-
             temperature,
-
             humidity,
-
             gas,
-
             flame
-
         )
 
 
@@ -475,11 +372,9 @@ def get_sensor_data():
 def run_yolo():
 
     fire_detected = False
-
     smoke_detected = False
 
     fire_confidence = 0.0
-
     smoke_confidence = 0.0
 
 
@@ -500,15 +395,10 @@ def run_yolo():
         )
 
         return (
-
             fire_detected,
-
             smoke_detected,
-
             fire_confidence,
-
             smoke_confidence
-
         )
 
 
@@ -522,30 +412,18 @@ def run_yolo():
             "ERROR: YOLO test image not found:"
         )
 
-        print(
-            YOLO_IMAGE_PATH
-        )
+        print(YOLO_IMAGE_PATH)
 
         return (
-
             fire_detected,
-
             smoke_detected,
-
             fire_confidence,
-
             smoke_confidence
-
         )
 
 
-    print(
-        "\nYOLO image:"
-    )
-
-    print(
-        YOLO_IMAGE_PATH
-    )
+    print("\nYOLO image:")
+    print(YOLO_IMAGE_PATH)
 
 
     # --------------------------------------------------------
@@ -556,9 +434,7 @@ def run_yolo():
 
         results = YOLO_MODEL.predict(
 
-            source=str(
-                YOLO_IMAGE_PATH
-            ),
+            source=str(YOLO_IMAGE_PATH),
 
             conf=0.25,
 
@@ -571,7 +447,6 @@ def run_yolo():
             name="flask_prediction",
 
             exist_ok=True
-
         )
 
 
@@ -582,7 +457,6 @@ def run_yolo():
         for result in results:
 
             if result.boxes is None:
-
                 continue
 
 
@@ -599,20 +473,14 @@ def run_yolo():
 
 
                 class_name = str(
-
-                    YOLO_MODEL.names[
-                        class_id
-                    ]
-
+                    YOLO_MODEL.names[class_id]
                 ).lower()
 
 
                 print(
-
                     f"YOLO Detection: "
                     f"{class_name} "
                     f"{confidence * 100:.2f}%"
-
                 )
 
 
@@ -625,11 +493,8 @@ def run_yolo():
                     fire_detected = True
 
                     fire_confidence = max(
-
                         fire_confidence,
-
                         confidence
-
                     )
 
 
@@ -642,11 +507,8 @@ def run_yolo():
                     smoke_detected = True
 
                     smoke_confidence = max(
-
                         smoke_confidence,
-
                         confidence
-
                     )
 
 
@@ -670,34 +532,23 @@ def run_yolo():
         )
 
         print(
-
             "Fire Confidence:",
-
             f"{fire_confidence * 100:.2f}%"
-
         )
 
         print(
-
             "Smoke Confidence:",
-
             f"{smoke_confidence * 100:.2f}%"
-
         )
 
         print("-" * 65)
 
 
         return (
-
             fire_detected,
-
             smoke_detected,
-
             fire_confidence,
-
             smoke_confidence
-
         )
 
 
@@ -711,73 +562,144 @@ def run_yolo():
 
 
         return (
-
             False,
-
             False,
-
             0.0,
-
             0.0
-
         )
 
 
 # ============================================================
-# FINAL DECISION
+# DECISION FUSION
+# ============================================================
+#
+# RF + YOLO are combined here.
+#
+# RF:
+#     Normal
+#     Warning
+#     Critical
+#
+# YOLO:
+#     No Detection
+#     Smoke
+#     Fire
+#
+# Fusion priority:
+#
+#     Fire      -> Critical
+#     RF Critical -> Critical
+#     RF Warning + Smoke -> Warning
+#     RF Warning -> Warning
+#     Smoke -> Warning
+#     Otherwise -> Normal
+#
 # ============================================================
 
-def get_final_status(
-
+def decision_fusion(
     rf_status,
-
     fire_detected,
-
-    smoke_detected
-
+    smoke_detected,
+    fire_confidence=0.0,
+    smoke_confidence=0.0
 ):
 
+    print("\n")
+    print("=" * 65)
+    print("DECISION FUSION")
+    print("=" * 65)
+
+
+    print(
+        "RF Status:",
+        rf_status
+    )
+
+    print(
+        "YOLO Fire:",
+        fire_detected,
+        f"({fire_confidence * 100:.2f}%)"
+    )
+
+    print(
+        "YOLO Smoke:",
+        smoke_detected,
+        f"({smoke_confidence * 100:.2f}%)"
+    )
+
+
     # --------------------------------------------------------
-    # RF CRITICAL
-    # --------------------------------------------------------
-
-    if rf_status == "Critical":
-
-        return "Critical"
-
-
-    # --------------------------------------------------------
-    # YOLO FIRE
+    # RULE 1
+    # FIRE DETECTION = CRITICAL
     # --------------------------------------------------------
 
     if fire_detected:
 
-        return "Critical"
+        final_status = "Critical"
 
 
     # --------------------------------------------------------
+    # RULE 2
+    # RF CRITICAL = CRITICAL
+    # --------------------------------------------------------
+
+    elif rf_status == "Critical":
+
+        final_status = "Critical"
+
+
+    # --------------------------------------------------------
+    # RULE 3
+    # RF WARNING + SMOKE = WARNING
+    # --------------------------------------------------------
+
+    elif (
+        rf_status == "Warning"
+        and smoke_detected
+    ):
+
+        final_status = "Warning"
+
+
+    # --------------------------------------------------------
+    # RULE 4
     # RF WARNING
     # --------------------------------------------------------
 
-    if rf_status == "Warning":
+    elif rf_status == "Warning":
 
-        return "Warning"
+        final_status = "Warning"
 
 
     # --------------------------------------------------------
+    # RULE 5
     # YOLO SMOKE
     # --------------------------------------------------------
 
-    if smoke_detected:
+    elif smoke_detected:
 
-        return "Warning"
+        final_status = "Warning"
 
 
     # --------------------------------------------------------
-    # NORMAL
+    # RULE 6
+    # BOTH NORMAL
     # --------------------------------------------------------
 
-    return "Normal"
+    else:
+
+        final_status = "Normal"
+
+
+    print(
+        "\nFUSED FINAL STATUS:",
+        final_status
+    )
+
+    print("=" * 65)
+
+
+    return final_status
 
 
 # ============================================================
@@ -785,15 +707,10 @@ def get_final_status(
 # ============================================================
 
 def write_ai_results(
-
     rf_status,
-
     fire_detected,
-
     smoke_detected,
-
     final_status
-
 ):
 
     if not THINGSPEAK_WRITE_API_KEY:
@@ -818,25 +735,18 @@ def write_ai_results(
         "Warning": 1,
 
         "Critical": 2
-
     }
 
 
     rf_value = status_values.get(
-
         rf_status,
-
         -1
-
     )
 
 
     final_value = status_values.get(
-
         final_status,
-
         -1
-
     )
 
 
@@ -908,7 +818,6 @@ def write_ai_results(
 
         "field7":
             final_value
-
     }
 
 
@@ -921,25 +830,18 @@ def write_ai_results(
             params=params,
 
             timeout=10
-
         )
 
 
         print(
-
             "\nThingSpeak WRITE Status:",
-
             response.status_code
-
         )
 
 
         print(
-
             "ThingSpeak WRITE Response:",
-
             response.text
-
         )
 
 
@@ -996,7 +898,7 @@ def run_complete_ai_pipeline():
     )
 
     print(
-        "          RF + YOLO + THINGSPEAK"
+        "          RF + YOLO + DECISION FUSION"
     )
 
     print("=" * 65)
@@ -1032,15 +934,10 @@ def run_complete_ai_pipeline():
 
 
     (
-
         temperature,
-
         humidity,
-
         gas,
-
         flame
-
     ) = sensor_data
 
 
@@ -1050,7 +947,6 @@ def run_complete_ai_pipeline():
     # ========================================================
 
     rf_status = "Unknown"
-
     rf_probabilities = {}
 
 
@@ -1078,21 +974,15 @@ def run_complete_ai_pipeline():
         try:
 
             (
-
                 rf_status,
-
                 rf_probabilities
-
             ) = predict_fire_status(
 
                 RF_MODEL,
 
                 temperature,
-
                 humidity,
-
                 gas,
-
                 flame
 
             )
@@ -1125,13 +1015,9 @@ def run_complete_ai_pipeline():
     # ========================================================
 
     (
-
         fire_detected,
-
         smoke_detected,
-
         fire_confidence,
-
         smoke_confidence
 
     ) = run_yolo()
@@ -1157,16 +1043,20 @@ def run_complete_ai_pipeline():
 
     # ========================================================
     # STEP 5
-    # FINAL STATUS
+    # DECISION FUSION
     # ========================================================
 
-    final_status = get_final_status(
+    final_status = decision_fusion(
 
         rf_status,
 
         fire_detected,
 
-        smoke_detected
+        smoke_detected,
+
+        fire_confidence,
+
+        smoke_confidence
 
     )
 
@@ -1188,70 +1078,49 @@ def run_complete_ai_pipeline():
 
 
     print(
-
         f"Temperature : "
         f"{temperature:.2f} °C"
-
     )
 
 
     print(
-
         f"Humidity    : "
         f"{humidity:.2f} %"
-
     )
 
 
     print(
-
         f"Gas         : "
         f"{gas:.2f}"
-
     )
 
 
     print(
-
         "Flame       :",
 
         (
-
             "DETECTED"
-
             if flame == 1
-
             else "NOT DETECTED"
-
         )
-
     )
 
 
     print(
-
         "\nRF          :",
-
         rf_status
-
     )
 
 
     print(
-
         "YOLO        :",
-
         yolo_status
-
     )
 
 
     print(
-
-        "Final       :",
-
+        "Fusion      :",
         final_status
-
     )
 
 
@@ -1293,15 +1162,10 @@ def run_complete_ai_pipeline():
             f"{gas:.2f}",
 
         "flame":
-
             (
-
                 "DETECTED"
-
                 if flame == 1
-
                 else "NOT DETECTED"
-
             ),
 
         "rf_status":
@@ -1350,7 +1214,7 @@ if __name__ == "__main__":
     )
 
     print(
-        "       RF + YOLO + THINGSPEAK"
+        "       RF + YOLO + DECISION FUSION"
     )
 
     print("=" * 65)
@@ -1364,9 +1228,7 @@ if __name__ == "__main__":
         "\nProject Directory:"
     )
 
-    print(
-        AI_DIR
-    )
+    print(AI_DIR)
 
 
     # --------------------------------------------------------
